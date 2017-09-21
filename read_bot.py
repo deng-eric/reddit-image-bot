@@ -33,8 +33,7 @@ def isReddit(url):
 def isImgur(url):
     imgur   = re.match(r'^(http|https)\:\/\/imgur\.com', url, re.M|re.I)
     album   = re.match(r'^(http|https)\:\/\/imgur\.com\/(a|gallery)\/', url, re.M|re.I)
-    direct  = re.match(r'.*\.jpg', url, re.M|re.I)
-
+    direct  = re.match(r'.(http|https)\:\/\/i\.imgur\.com', url, re.M|re.I)
     if direct:
         urlType = "direct"
     elif album:
@@ -72,14 +71,14 @@ def handleImgurAlbum(submission):
     title = str(submission.title)
 
     albumID = submission.url.split('/')[-1]
-    albumImages = imgur.get_album_images(albumID)
-
-    print '/r/' + path + '/' + title
-    print str(submission.url) 
-    for albumImage in albumImages:
-        url = albumImage.link
-        filename = url.split('/')[-1]
-        download(title, path, filename, url)
+    try:
+        albumImages = imgur.get_album_images(albumID)
+        for albumImage in albumImages:
+            url = albumImage.link
+            filename = url.split('/')[-1]
+            download(title, path, filename, url)
+    except: 
+        pass
 
 for submission in subreddit.stream.submissions():
     if isReddit(submission.url):
